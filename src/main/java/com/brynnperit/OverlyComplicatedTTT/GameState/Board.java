@@ -2,26 +2,48 @@ package com.brynnperit.OverlyComplicatedTTT.GameState;
 
 import java.util.*;
 
-public record Board(Map<BoardPosition, PositionState> boardPositions) {
+public class Board implements BoardDimension {
 
-    private static void dimensionRecurserStarter(Map<BoardPosition, PositionState> boardPositions, List<Integer> dimensionSizes){
-        dimensionRecurser(boardPositions, dimensionSizes, new int[dimensionSizes.size()], 0);
+    private final BoardDimension dimensions;
+    
+    public int getContainedDimensions() {
+        return dimensions.getContainedDimensions();
     }
 
-    private static void dimensionRecurser(Map<BoardPosition, PositionState> boardPositions, List<Integer> dimensionSizes, int[] dimensionPosition, int dimensionIndex){
-        if (dimensionIndex < dimensionSizes.size()){
-            for (int currentDimensionPosition = 0; currentDimensionPosition < dimensionSizes.get(dimensionIndex); currentDimensionPosition++){
-                dimensionPosition[dimensionIndex] = currentDimensionPosition;
-                dimensionRecurser(boardPositions, dimensionSizes, dimensionPosition, dimensionIndex+1);
-            }
-        }else{
-            boardPositions.put(new BoardPosition(dimensionPosition), PositionState.EMPTY);
-        }
+    public List<Integer> getDimensionSizes(){
+        return dimensions.getDimensionSizes();
+    }
+
+    public PositionState getPositionState(List<Integer> boardPosition) throws IncorrectCoordinateListLengthException{
+        return dimensions.getPositionState(boardPosition);
+    }
+
+    @Override
+    public String toString() {
+        return dimensions.toString();
     }
 
     public Board(List<Integer> dimensionSizes) {
-        this(new HashMap<>());
-        dimensionRecurserStarter(boardPositions, dimensionSizes);
+        if (dimensionSizes.size() > 1) {
+            dimensions = new SubDimension(dimensionSizes);
+        } else {
+            dimensions = new FinalDimension(dimensionSizes);
+        }
     }
-    
+
+    @Override
+    public void setPositionState(List<Integer> boardPosition, PositionState toSet) throws IncorrectCoordinateListLengthException{
+         dimensions.setPositionState(boardPosition, toSet);
+    }
+
+    @Override
+    public PositionState getPositionState(int[] boardPosition) throws IncorrectCoordinateListLengthException {
+        return dimensions.getPositionState(boardPosition);
+    }
+
+    @Override
+    public void setPositionState(int[] boardPosition, PositionState toSet) throws IncorrectCoordinateListLengthException {
+        dimensions.setPositionState(boardPosition, toSet);
+    }
+
 }
